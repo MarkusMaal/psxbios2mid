@@ -1,9 +1,34 @@
-using System.Text;
+using MidiSharp;
+using MidiSharp.Events.Meta;
+using MidiSharp.Events.Voice;
+using MidiSharp.Events.Voice.Note;
 
 namespace psxbios2mid_app;
 
 public abstract class ExtractTools
 {
+    public static void ConvertSeqMid(string inFile, string outFile)
+    {
+        var seq = new PsxSeq(File.OpenRead(inFile));
+        foreach (var (i, t) in seq.Tracks.Index())
+        {
+            var outStream =  new FileStream($"{outFile[..^3] }{i}.mid", FileMode.Create);
+            var midiFile = new MidiSequence(Format.Zero, 960);
+            midiFile.Tracks.AddNewTrack();
+            foreach (var e in t)
+            {
+                var channelNum = e.ProgramNumber;
+                midiFile.Tracks.Last().Events
+                    .Add(new ProgramChangeVoiceMidiEvent(e.TimeOffset, channelNum, e.ProgramNumber));
+                midiFile.Tracks.Last().Events
+                    .Add(new OnNoteVoiceMidiEvent(e.TimeOffset, channelNum, e.NoteNumber, e.Velocity));
+            }
+            midiFile.Tracks.Last().Events.Add(new EndOfTrackMetaMidiEvent(9999));
+            midiFile.Save(outStream);
+            outStream.Close();
+        }
+    }
+    
     public static void FindExtractVab(string inFile, string outFile)
     {
         Console.WriteLine("Searching for VAB header...");

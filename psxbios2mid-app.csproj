@@ -8,4 +8,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MidiSharp" Version="0.9.6516.2348" />
+    </ItemGroup>
+
 </Project>

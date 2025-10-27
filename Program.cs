@@ -28,7 +28,8 @@ public static class Program
                 ExtractTools.FindExtractSeq(processor.InputFile!, processor.OutFile!);
                 break;
             case Modes.SeqToMidi:
-                throw new NotImplementedException();
+                ExtractTools.ConvertSeqMid(processor.InputFile!, processor.OutFile!);
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
