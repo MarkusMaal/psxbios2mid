@@ -30,6 +30,9 @@ public static class Program
             case Modes.SeqToMidi:
                 ExtractTools.ConvertSeqMid(processor.InputFile!, processor.OutFile!);
                 break;
+            case Modes.MidiToSeq:
+                ExtractTools.MidiToSeq(processor.InputFile!, processor.OutFile!);
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -49,6 +52,7 @@ public static class Program
                           --extract-vab [-ev]   - Extract VAB file from the memory dump
                           --extract-seq [-es]   - Extract sequence from memory dump (proprietary format)
                           --seq-to-midi [-sm]   - Convert extracted sequence to MIDI
+                          --midi-to-seq [-ms]   - Convert MIDI to standard PSX sequence
                           
                           --input [-i]          - Input file (not required for -h and -v)
                           --output [-o]         - Output file (not required for -h and -v)

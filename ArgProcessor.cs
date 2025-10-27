@@ -18,6 +18,7 @@ public class ArgProcessor
                 "--extract-vab" or "-ev" => Modes.ExtractVab,
                 "--extract-seq" or "-es" => Modes.ExtractSeq,
                 "--seq-to-midi" or "-sm" => Modes.SeqToMidi,
+                "--midi-to-seq" or "-ms" => Modes.MidiToSeq,
                 _ => Mode
             };
 
@@ -40,7 +41,7 @@ public class ArgProcessor
     {
         return Mode switch
         {
-            Modes.ExtractVab or Modes.ExtractSeq or Modes.SeqToMidi =>
+            Modes.ExtractVab or Modes.ExtractSeq or Modes.SeqToMidi or Modes.MidiToSeq =>
                 InputFile != null && File.Exists(InputFile) && OutFile != null,
             _ => true
         };
@@ -54,4 +55,5 @@ public enum Modes
     ExtractVab,
     ExtractSeq,
     SeqToMidi,
+    MidiToSeq,
 }

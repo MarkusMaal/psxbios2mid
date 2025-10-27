@@ -28,6 +28,14 @@ The extracted .SEQ file will be unusable. To fix this, we need to convert it to 
 
 The PlayStation BIOS has 2 sequences, one for the initial boot and the second one that plays when you insert a game disc, which is why you'll end up with 2 MIDI files.
 
+## Converting MIDI to PSX sequence
+
+After converting to MIDI, you can convert the MIDI file back into a PSX sequence (for use in tools like VGMTrans).
+
+`psxbios2mid -ms -i <path to converted MIDI file> -o <path to output .SEQ file>`
+
+Note: Only use the MIDI files created by this tool with this option!
+
 ## Data analysis
 
 If you want to analyse these formats (including the non-standard SEQ file), I have provided ImHex patterns on this repository located at the **patterns/** directory.

@@ -28,6 +28,25 @@ public abstract class ExtractTools
             outStream.Close();
         }
     }
+
+    public static void MidiToSeq(string inFile, string outFile)
+    {
+        using var inStream = new FileStream(inFile, FileMode.Open);
+        using (var outStream = new FileStream(outFile, FileMode.Create))
+        {
+            outStream.Write("pQES"u8.ToArray()); // SEQ header
+            outStream.Write([0, 0, 0, 1]);          // version
+            outStream.Write([1, 0x80]);             // resolution per quarter note
+            outStream.Write([0x04, 0x0F, 0x27]);    // tempo (not 100% certain this is correct)
+            outStream.Write([0x04, 0x04]);          // rhythm (4/4)
+            inStream.Position = 0x16;
+            while (inStream.Position < inStream.Length)
+            {
+                outStream.WriteByte((byte)inStream.ReadByte()); // the rest is just regular midi events
+            }
+        }
+        inStream.Close();
+    }
     
     public static void FindExtractVab(string inFile, string outFile)
     {
