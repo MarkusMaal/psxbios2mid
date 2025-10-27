@@ -13,17 +13,35 @@ public abstract class ExtractTools
         foreach (var (i, t) in seq.Tracks.Index())
         {
             var outStream =  new FileStream($"{outFile[..^3] }{i}.mid", FileMode.Create);
-            var midiFile = new MidiSequence(Format.Zero, 960);
+            var midiFile = new MidiSequence(Format.Zero, 720);
             midiFile.Tracks.AddNewTrack();
+            byte lastProg = 0;
+            var lastTime = 0;
+            var lastPan = 0;
             foreach (var e in t)
             {
                 var channelNum = e.ProgramNumber;
+                if (lastProg != e.ProgramNumber)
+                {
+                    midiFile.Tracks.Last().Events
+                        .Add(new ProgramChangeVoiceMidiEvent(e.TimeOffset, channelNum,
+                            e.ProgramNumber)); // Program Change
+                }
                 midiFile.Tracks.Last().Events
-                    .Add(new ProgramChangeVoiceMidiEvent(e.TimeOffset, channelNum, e.ProgramNumber));
-                midiFile.Tracks.Last().Events
-                    .Add(new OnNoteVoiceMidiEvent(e.TimeOffset, channelNum, e.NoteNumber, e.Velocity));
+                    .Add(new OnNoteVoiceMidiEvent(e.TimeOffset, channelNum, e.NoteNumber, e.Velocity)); // Play Note
+                if (lastPan != e.Pan)
+                {
+                    midiFile.Tracks.Last().Events.Add(
+                        new ControllerVoiceMidiEvent(e.TimeOffset, channelNum, Controller.PanPositionCourse,
+                            e.Pan) // Pan
+                    );
+                }
+
+                lastTime = e.TimeOffset;
+                lastProg = e.ProgramNumber;
+                lastPan = e.Pan;
             }
-            midiFile.Tracks.Last().Events.Add(new EndOfTrackMetaMidiEvent(9999));
+            midiFile.Tracks.Last().Events.Add(new EndOfTrackMetaMidiEvent(lastTime));
             midiFile.Save(outStream);
             outStream.Close();
         }
