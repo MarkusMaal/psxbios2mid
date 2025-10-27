@@ -18,10 +18,10 @@ public abstract class ExtractTools
         sr.Position = offset + 0xC;
         var lengthBuffer = new byte[4];
         sr.ReadExactly(lengthBuffer, 0, 4);
-        var vabLength = Convert.ToInt32(lengthBuffer);
+        var vabLength = BitConverter.ToInt32(lengthBuffer);
         var vabBuffer =  new byte[vabLength];
         sr.Position = offset;
-        sr.ReadExactly(vabBuffer, 0, lengthBuffer.Length);
+        sr.ReadExactly(vabBuffer, 0, vabBuffer.Length);
         using (var sw = File.OpenWrite(outFile))
         {
             sw.Write(vabBuffer, 0, vabBuffer.Length);
@@ -46,7 +46,7 @@ public abstract class ExtractTools
         sr.Position = offset + 0xC;
         var lengthBuffer = new byte[4];
         sr.ReadExactly(lengthBuffer, 0, 4);
-        var vabLength = Convert.ToInt32(lengthBuffer);
+        var vabLength = BitConverter.ToInt32(lengthBuffer);
         sr.Position = offset + vabLength;
         
         Console.WriteLine("Saving sequence data...");
@@ -66,12 +66,18 @@ public abstract class ExtractTools
     private static int FindVab(Stream inStream)
     {
         var offset = -1;
-        for (var i = 0; i < inStream.Length; i+=16)
+        var i = 0;
+        inStream.Position = 0;
+        while (inStream.Position < inStream.Length - 4)
         {
-            inStream.Position = i;
             var buffer = new byte[4];
             inStream.ReadExactly(buffer, 0, 4);
-            if (buffer != "pBAV"u8.ToArray()) continue;
+
+            if (BitConverter.ToUInt32(buffer) != 0x56414270)
+            {
+                i += 4;
+                continue;
+            }
             offset = i;
             break;
         }
